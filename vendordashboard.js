@@ -23,11 +23,9 @@ const firebaseConfig = {
   projectId: "saathibazar-59132",
   storageBucket: "saathibazar-59132.appspot.com",
   messagingSenderId: "70401479708",
-  appId: "1:70401479708:web:32568f0136713e32757bd9",
-  measurementId: "G-GC9NYHSL0G"
+  appId: "1:70401479708:web:32568f0136713e32757bd9"
 };
 
-// 🔌 Init Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
@@ -36,33 +34,28 @@ let currentUserUID = null;
 let cart = [];
 let allMaterials = [];
 
-// 🚀 Init Elements
-const whatsappInput = document.getElementById("whatsappInput");
-const saveWhatsappBtn = document.getElementById("saveWhatsappBtn");
-const detectLocationBtn = document.getElementById("detectLocationBtn");
-const locationInput = document.getElementById("locationInput");
-const saveLocationBtn = document.getElementById("saveLocationBtn");
-const currentLocationText = document.getElementById("currentLocationText");
-
-// 🧠 Auth Check
+// ✅ Check login state
 onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUserUID = user.uid;
     fetchMaterials();
     fetchOrders();
     loadWhatsappNumber(user.uid);
-    loadLocation(user.uid); // ✅ load saved location
+    loadLocation(user.uid);
   } else {
     window.location.href = "vendorlogin.html";
   }
 });
 
-// ☎️ Load WhatsApp Number
+// ✅ WhatsApp Number
+const whatsappInput = document.getElementById("whatsappInput");
+const saveWhatsappBtn = document.getElementById("saveWhatsappBtn");
+
 async function loadWhatsappNumber(uid) {
   const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  if (userSnap.exists()) {
-    const data = userSnap.data();
+  const snap = await getDoc(userRef);
+  if (snap.exists()) {
+    const data = snap.data();
     if (data.whatsapp && whatsappInput) {
       whatsappInput.value = data.whatsapp;
     }
@@ -72,102 +65,62 @@ async function loadWhatsappNumber(uid) {
 saveWhatsappBtn?.addEventListener("click", async () => {
   const number = whatsappInput?.value.trim();
   if (!number.startsWith("+91") || number.length < 12) {
-    alert("📞 Please enter valid WhatsApp number with +91");
+    alert("📞 Enter valid number with +91");
     return;
   }
-
-  try {
-    const userRef = doc(db, "users", currentUserUID);
-    await setDoc(userRef, { whatsapp: number }, { merge: true });
-    alert("✅ WhatsApp number saved!");
-  } catch (err) {
-    console.error("❌ Error saving WhatsApp:", err);
-    alert("❌ Failed to save WhatsApp number.");
-  }
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  await setDoc(userRef, { whatsapp: number }, { merge: true });
+  alert("✅ WhatsApp number saved!");
 });
 
-let map, marker;
-
-function initMap(lat = 20.5937, lng = 78.9629) { // default: India center
-  if (!map) {
-    map = L.map('locationMap').setView([lat, lng], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-  }
-
-  if (marker) {
-    marker.setLatLng([lat, lng]);
-  } else {
-    marker = L.marker([lat, lng]).addTo(map);
-  }
-
-  map.setView([lat, lng], 13);
-}
-
-detectLocationBtn?.addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    alert("❌ Geolocation not supported.");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition((position) => {
-    const { latitude, longitude } = position.coords;
-    const coords = `Lat: ${latitude.toFixed(5)}, Lng: ${longitude.toFixed(5)}`;
-    locationInput.value = coords;
-    initMap(latitude, longitude); // Show on map
-  }, (err) => {
-    console.error("Error getting location:", err);
-    alert("❌ Could not detect location.");
-  });
-});
+// ✅ Location Detection
+const locationInput = document.getElementById("locationInput");
+const saveLocationBtn = document.getElementById("saveLocationBtn");
+const detectLocationBtn = document.getElementById("detectLocationBtn");
+const locationDisplay = document.getElementById("locationDisplay");
 
 saveLocationBtn?.addEventListener("click", async () => {
-  const location = locationInput?.value.trim();
-  if (!location) {
-    alert("⚠️ Please enter or detect your shop location.");
-    return;
-  }
+  const location = locationInput.value.trim();
+  if (location.length < 3) return alert("Enter a valid location");
+  const ref = doc(db, "users", auth.currentUser.uid);
+  await setDoc(ref, { location }, { merge: true });
+  locationDisplay.textContent = location;
+  alert("📍 Location saved!");
+});
 
-  try {
-    const userRef = doc(db, "users", currentUserUID);
-    await setDoc(userRef, { location }, { merge: true });
-    currentLocationText.textContent = location;
-
-    const [latStr, lngStr] = location.match(/-?\d+(\.\d+)?/g);
-    if (latStr && lngStr) initMap(parseFloat(latStr), parseFloat(lngStr));
-
-    alert("✅ Location saved!");
-  } catch (err) {
-    console.error("❌ Error saving location:", err);
-    alert("❌ Failed to save location.");
+detectLocationBtn?.addEventListener("click", () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+      const data = await response.json();
+      const address = data?.display_name || `Lat: ${latitude}, Lon: ${longitude}`;
+      locationDisplay.textContent = address;
+      await setDoc(doc(db, "users", currentUserUID), { location: address }, { merge: true });
+    });
+  } else {
+    alert("Geolocation not supported");
   }
 });
 
 async function loadLocation(uid) {
   const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  if (userSnap.exists()) {
-    const data = userSnap.data();
-    if (data.location && locationInput && currentLocationText) {
-      locationInput.value = data.location;
-      currentLocationText.textContent = data.location;
-
-      const [latStr, lngStr] = data.location.match(/-?\d+(\.\d+)?/g);
-      if (latStr && lngStr) initMap(parseFloat(latStr), parseFloat(lngStr));
+  const snap = await getDoc(userRef);
+  if (snap.exists()) {
+    const data = snap.data();
+    if (data.location && locationDisplay) {
+      locationDisplay.textContent = data.location;
     }
   }
 }
 
-// 🛒 Fetch Materials
+// ✅ Fetch Materials
 async function fetchMaterials() {
   const snapshot = await getDocs(collection(db, "materials"));
   allMaterials = [];
-
   snapshot.forEach((doc) => {
     allMaterials.push({ id: doc.id, ...doc.data() });
   });
-
   displayMaterials(allMaterials);
 }
 
@@ -175,102 +128,75 @@ function displayMaterials(materials) {
   const container = document.getElementById("materialsList");
   container.innerHTML = "";
 
-  if (materials.length === 0) {
-    container.innerHTML = "<p>No materials found.</p>";
-    return;
-  }
-
-  materials.forEach((material) => {
+  materials.forEach((mat) => {
     const card = document.createElement("div");
-    card.className = "bg-gray-100 p-4 border rounded shadow";
-
+    card.className = "bg-gray-100 p-4 border rounded shadow hover:shadow-lg transition";
     card.innerHTML = `
-      <h3 class="font-bold">${material.name}</h3>
-      <p>Qty: ${material.quantity} ${material.unit}</p>
-      <p>Price: ₹${material.price} / ${material.unit}</p>
+      <h3 class="font-bold">${mat.name}</h3>
+      <p>Qty: ${mat.quantity} ${mat.unit}</p>
+      <p>₹${mat.price} / ${mat.unit}</p>
       <div class="flex gap-2 mt-2">
-        <input type="number" id="qty-${material.id}" value="1" min="1" class="border p-1 rounded w-16 text-sm" />
-        <button onclick="addToCart('${material.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">
-          Add to Cart
-        </button>
+        <input type="number" id="qty-${mat.id}" value="1" min="1" class="border p-1 rounded w-16 text-sm" />
+        <button onclick="addToCart('${mat.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Add to Cart</button>
       </div>
     `;
     container.appendChild(card);
   });
 }
 
-// ➕ Add to Cart
-window.addToCart = (materialId) => {
-  const material = allMaterials.find((m) => m.id === materialId);
-  const qtyInput = document.getElementById(`qty-${materialId}`);
-  const quantity = parseInt(qtyInput.value);
+// ✅ Cart Logic
+window.addToCart = (id) => {
+  const mat = allMaterials.find((m) => m.id === id);
+  const qty = parseInt(document.getElementById(`qty-${id}`).value);
+  if (!mat || qty <= 0 || qty > mat.quantity) return alert("Invalid quantity");
 
-  if (!material || quantity <= 0 || quantity > material.quantity) {
-    alert("Invalid quantity selected.");
-    return;
-  }
+  const existing = cart.find((i) => i.id === id);
+  if (existing) existing.quantity += qty;
+  else cart.push({ ...mat, quantity: qty });
 
-  const existing = cart.find((item) => item.id === materialId);
-  if (existing) {
-    existing.quantity += quantity;
-  } else {
-    cart.push({
-      id: materialId,
-      name: material.name,
-      quantity,
-      unit: material.unit,
-      price: material.price,
-      supplierId: material.supplierId
-    });
-  }
-
-  updateCartDisplay();
-  alert(`${material.name} added to cart!`);
+  updateCart();
 };
 
-// 🗑️ Remove from Cart
-window.removeFromCart = (index) => {
-  cart.splice(index, 1);
-  updateCartDisplay();
-};
-
-// 🧾 Update Cart UI
-function updateCartDisplay() {
+function updateCart() {
   const container = document.getElementById("cartItems");
-  const totalElement = document.getElementById("cartTotal");
-  const placeOrderBtn = document.getElementById("placeOrderBtn");
+  const totalEl = document.getElementById("cartTotal");
+  const btn = document.getElementById("placeOrderBtn");
 
   container.innerHTML = "";
   let total = 0;
 
   if (cart.length === 0) {
-    container.innerHTML = "<p>Your cart is empty.</p>";
-    placeOrderBtn.disabled = true;
-    totalElement.textContent = "Total: ₹0";
+    container.innerHTML = "<p>Cart is empty</p>";
+    btn.disabled = true;
+    totalEl.textContent = "Total: ₹0";
     return;
   }
 
   cart.forEach((item, index) => {
-    const itemTotal = item.quantity * item.price;
-    total += itemTotal;
-
+    const price = item.price * item.quantity;
+    total += price;
     const div = document.createElement("div");
     div.className = "flex justify-between items-center bg-white p-2 border rounded mb-2";
     div.innerHTML = `
       <span>${item.name} - ${item.quantity} ${item.unit}</span>
       <div class="flex gap-2 items-center">
-        <span>₹${itemTotal}</span>
+        <span>₹${price}</span>
         <button onclick="removeFromCart(${index})" class="text-red-500 font-bold">×</button>
       </div>
     `;
     container.appendChild(div);
   });
 
-  totalElement.textContent = `Total: ₹${total}`;
-  placeOrderBtn.disabled = false;
+  totalEl.textContent = `Total: ₹${total}`;
+  btn.disabled = false;
 }
 
-// 🛍️ Place Order
+window.removeFromCart = (i) => {
+  cart.splice(i, 1);
+  updateCart();
+};
+
+// ✅ Place Order + WhatsApp Message
 document.getElementById("placeOrderBtn").addEventListener("click", async () => {
   if (cart.length === 0) return;
 
@@ -280,59 +206,43 @@ document.getElementById("placeOrderBtn").addEventListener("click", async () => {
     grouped[item.supplierId].push(item);
   });
 
-  try {
-    for (const supplierId in grouped) {
-      const items = grouped[supplierId];
+  for (const supplierId in grouped) {
+    const items = grouped[supplierId];
 
-      // Save order
-      await addDoc(collection(db, "orders"), {
-        vendorId: currentUserUID,
-        supplierId,
-        items,
-        status: "Pending",
-        timestamp: new Date()
+    await addDoc(collection(db, "orders"), {
+      vendorId: currentUserUID,
+      supplierId,
+      items,
+      status: "Pending",
+      timestamp: new Date()
+    });
+
+    const snap = await getDocs(query(collection(db, "users"), where("uid", "==", supplierId)));
+    const supplier = snap.docs[0]?.data();
+
+    if (supplier?.whatsapp) {
+      const list = items.map(i => `${i.name} x${i.quantity}`).join(", ");
+      const msg = `📦 New Order from Vendor:\n${list}`;
+      await fetch("http://localhost:3000/send-whatsapp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: supplier.whatsapp, message: msg })
       });
-
-      // Notify supplier on WhatsApp
-      const snap = await getDocs(query(collection(db, "users"), where("uid", "==", supplierId)));
-      const supplier = snap.docs[0]?.data();
-
-      if (supplier?.whatsapp) {
-        const itemList = items.map(i => `${i.name} x${i.quantity} ${i.unit}`).join(", ");
-        const msg = `📦 New Order Received on SaathiBazar!\nItems: ${itemList}`;
-
-        await fetch("http://localhost:3000/send-whatsapp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: supplier.whatsapp,
-            message: msg
-          })
-        });
-      }
     }
-
-    alert("✅ Order placed and supplier notified!");
-    cart = [];
-    updateCartDisplay();
-    fetchOrders();
-  } catch (err) {
-    console.error("❌ Error placing order:", err);
-    alert("Something went wrong!");
   }
+
+  alert("✅ Order placed!");
+  cart = [];
+  updateCart();
+  fetchOrders();
 });
 
-// 📦 Fetch Orders
+// ✅ Vendor Orders
 async function fetchOrders() {
   const q = query(collection(db, "orders"), where("vendorId", "==", currentUserUID));
   const snapshot = await getDocs(q);
   const container = document.getElementById("ordersList");
-
   container.innerHTML = "";
-  if (snapshot.empty) {
-    container.innerHTML = "<p>No orders placed yet.</p>";
-    return;
-  }
 
   snapshot.forEach(docSnap => {
     const order = docSnap.data();
@@ -345,71 +255,7 @@ async function fetchOrders() {
       </ul>
       <p><strong>Status:</strong> ${order.status}</p>
     `;
-    if (order.status === "Completed") {
-  div.innerHTML += `
-    <a href="review.html?vendorId=${order.supplierId}" 
-       class="bg-blue-600 text-white px-3 py-1 rounded mt-2 inline-block">
-      Leave a Review
-    </a>
-  `;
-}
-
     container.appendChild(div);
-  });
-}
-
-// 🌟 Load Reviews for this Vendor
-async function loadReviews() {
-  const reviewsRef = collection(db, "reviews");
-  const q = query(reviewsRef, where("vendorId", "==", currentUserUID));
-  const snapshot = await getDocs(q);
-
-  const container = document.getElementById("reviewsContainer");
-  container.innerHTML = "";
-
-  if (snapshot.empty) {
-    container.innerHTML = "<p class='text-gray-500'>No reviews yet.</p>";
-    return;
-  }
-
-  snapshot.forEach(docSnap => {
-    const review = docSnap.data();
-    const stars = "⭐".repeat(review.rating || 0);
-    const div = document.createElement("div");
-    div.className = "border border-gray-300 rounded p-4 bg-gray-50";
-
-    div.innerHTML = `
-      <div class="flex justify-between items-center mb-1">
-        <span class="font-semibold text-green-800">${review.customerName || 'Anonymous'}</span>
-        <span class="text-yellow-500">${stars}</span>
-      </div>
-      <p class="text-gray-700 italic">"${review.comment}"</p>
-      <p class="text-sm text-gray-400">${new Date(review.date?.seconds * 1000).toLocaleDateString()}</p>
-    `;
-
-    container.appendChild(div);
-  });
-}
-async function loadReviews() {
-  const q = query(collection(db, "reviews"), where("vendorId", "==", currentUserUID));
-  const snap = await getDocs(q);
-
-  const container = document.getElementById("reviewsContainer");
-  container.innerHTML = "";
-
-  if (snap.empty) {
-    container.innerHTML = "<p>No reviews yet.</p>";
-    return;
-  }
-
-  snap.forEach(doc => {
-    const data = doc.data();
-    container.innerHTML += `
-      <div class="bg-gray-100 p-4 rounded shadow">
-        <p><strong>${data.customerName}</strong> ⭐ ${data.rating}/5</p>
-        <p class="text-sm text-gray-600 italic">${data.comment}</p>
-      </div>
-    `;
   });
 }
 
