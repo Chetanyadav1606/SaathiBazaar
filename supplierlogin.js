@@ -21,6 +21,22 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+ // Email/Password Login
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Login successful!");
+          window.location.href = "supplierdashboard.html"; // ✅ redirect to supplier dashboard
+        })
+        .catch((error) => {
+          alert("Login failed: " + error.message);
+        });
+    });
 
 // ✅ Google Sign-in Button Event
 document.getElementById("googleLogin").addEventListener("click", () => {
