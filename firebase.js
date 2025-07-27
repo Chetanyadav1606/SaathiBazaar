@@ -5,13 +5,14 @@ import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestam
 
 // ✅ Replace these with your Firebase project config
 const firebaseConfig = {
-  apiKey: "AIzaSyDALc5-P5QIX2Nw_DcxN4XDxxKhfdLqQOU",
-  authDomain: "saathibazar-59132.firebaseapp.com",
-  projectId: "saathibazar-59132",
-  storageBucket: "saathibazar-59132.firebasestorage.app",
-  messagingSenderId: "70401479708",
-  appId: "1:70401479708:web:32568f0136713e32757bd9",
-  measurementId: "G-GC9NYHSL0G"
+  apiKey: "AIzaSyDALc5-P5QIX2Nw_DcxN4XDxxKhfdLqQOU",  // apikey of firebase
+  authDomain: "saathibazar-59132.firebaseapp.com",    //authdomain key
+  projectId: "saathibazar-59132",//projectId
+  storageBucket: "saathibazar-59132.firebasestorage.app", //storage buccket
+  messagingSenderId: "70401479708",  //messagind sender id
+
+  appId: "1:70401479708:web:32568f0136713e32757bd9", //appid
+  measurementId: "G-GC9NYHSL0G"  //measurement id
 };
 
 // Initialize Firebase
