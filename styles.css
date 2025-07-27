@@ -1,0 +1,207 @@
+/* === Base Reset & Background === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: white;
+  height: 100vh;
+  background: url('webback.jpg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
+  image-rendering: auto;
+  overflow-x: hidden;
+}
+
+/* === Animations Keyframes === */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInButtons {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* === Header === */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 60px;
+  background: rgba(0, 0, 0, 0.6);
+  animation: slideDown 1s ease-out forwards;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  gap: 10px;
+}
+
+.logo-circle {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* === Nav === */
+nav a {
+  margin: 0 18px;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+nav a:hover {
+  color: #a8ff60;
+}
+
+.nav-btn {
+  padding: 10px 20px;
+  background: #c5ff3f;
+  color: black;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.nav-btn:hover {
+  background: #a0e032;
+}
+
+/* === Main Hero Section === */
+main {
+  display: flex;
+  align-items: center;
+  height: 85vh;
+  padding-left: 60px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  max-width: 700px;
+  animation: fadeInUp 1.2s ease forwards;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  margin-top: 20px;
+  max-width: 600px;
+  color: #dddddd;
+  animation: fadeInUp 1.4s ease forwards;
+}
+
+.hero-buttons {
+  margin-top: 30px;
+  animation: fadeInButtons 1.6s ease forwards;
+}
+
+.btn {
+  padding: 14px 28px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-decoration: none;
+  margin-right: 20px;
+  transition: all 0.3s ease;
+}
+
+/* === Button Hover Animation === */
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.primary {
+  background: #c5ff3f;
+  color: black;
+}
+
+.secondary {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: 1px solid white;
+}
+
+.primary:hover {
+  background: #a0e032;
+}
+
+.secondary:hover {
+  background: white;
+  color: black;
+}
+/* === Hover Animations for Specific Elements === */
+
+/* 1. Nav links glow on hover */
+nav a:hover {
+  color: #a8ff60;
+  text-shadow: 0 0 10px #a8ff60;
+  transition: all 0.3s ease;
+}
+
+/* 2. Buttons scale slightly on hover (already applied, but keeping for clarity) */
+.btn:hover {
+  transform: scale(1.08);
+  transition: transform 0.3s ease;
+}
+
+/* 3. Hero heading wobble on hover */
+.hero-text h1:hover {
+  animation: wobble 0.4s ease;
+}
+
+/* 4. Hero paragraph subtle scale on hover */
+.hero-text p:hover {
+  transform: scale(1.03);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+/* 5. Logo rotates and scales on hover */
+.logo:hover {
+  transform: rotate(-3deg) scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+/* === Wobble Keyframe Used for Headings === */
+@keyframes wobble {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.05); }
+  50%  { transform: scale(0.97); }
+  75%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}

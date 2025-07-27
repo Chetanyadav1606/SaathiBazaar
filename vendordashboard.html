@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vendor Dashboard | SaathiBazar</title>
+  <!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script type="module" src="vendordashboard.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body {
+    position: relative;
+    background-image: url('webback.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+  }
+
+  /* 👇 Black semi-transparent overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-color: rgba(50, 47, 47, 0.5); /* adjust 0.5 for more/less dullness */
+    z-index: -1;
+  }
+    .bg-limeSoft { background-color: #88e839; }
+    .bg-neonGreen { background-color: #6e9a06; }
+    .bg-appleGreen { background-color: #a0e032; }
+  </style>
+</head>
+<body class="bg-gray-100 bg-opacity-40">
+  <nav class="bg-limeSoft bg-opacity-30 p-4 shadow flex justify-between items-center">
+    <div class="flex items-center space-x-3">
+      <img src="logo.jpg" alt="Logo" class="h-10" />
+      <h1 class="text-xl font-bold text-green-800">SaathiBazar - Vendor Dashboard</h1>
+    </div>
+    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-1 rounded">Logout</button>
+  </nav>
+
+  <main class="p-6 max-w-6xl mx-auto">
+    <!-- Vendor Location -->
+<section class="bg-white bg-opacity-95 p-6 rounded shadow mb-8">
+  <h2 class="text-2xl font-semibold mb-4 text-appleGreen">My Location</h2>
+  
+  <div class="space-y-4">
+    <div>
+      <label for="locationInput" class="block text-sm font-medium text-gray-700">Enter your shop location</label>
+      <input type="text" id="locationInput" placeholder="e.g., Nashik, Maharashtra" class="w-full border p-2 rounded mt-1" />
+    </div>
+
+    <div class="flex items-center gap-4">
+      <button id="saveLocationBtn" class="bg-neonGreen hover:bg-appleGreen text-white px-6 py-2 rounded">
+        Save Location
+      </button>
+
+      <button id="detectLocationBtn" class="bg-limeSoft hover:bg-appleGreen text-white px-6 py-2 rounded">
+        Detect My Location
+      </button>
+    </div>
+
+    <div id="currentLocation" class="text-gray-800 font-semibold">
+      📍 Current Location: <span class="text-green-700" id="currentLocationText">Not set</span>
+
+    </div>
+    <!-- 🌍 Location Map -->
+<div id="locationMap" class="mt-4 h-64 rounded border" style="height: 300px;"></div>
+
+  </div>
+</section>
+
+<!-- 📱 Add this to collect WhatsApp number -->
+<div class="my-4">
+  <label for="whatsappInput" class="block font-semibold text-sm mb-1">WhatsApp Number:</label>
+  <input id="whatsappInput" type="tel" placeholder="+91XXXXXXXXXX" class="border p-2 rounded w-full max-w-xs" />
+  <button id="saveWhatsappBtn" class="bg-blue-600 text-white px-3 py-1 rounded mt-2">Save WhatsApp</button>
+</div>
+
+<p class="text-sm text-gray-600 mt-1">Format: Include +91 for India (e.g., +919123456789)</p>
+
+    <!-- Search and Filter -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow mb-8">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Search Materials</h2>
+      <div class="flex flex-wrap gap-4 mb-4">
+        <input type="text" id="searchInput" placeholder="Search materials..." class="flex-1 border p-2 rounded" />
+        <select id="categoryFilter" class="border p-2 rounded">
+          <option value="">All Categories</option>
+          <option value="vegetables">Vegetables</option>
+          <option value="fruits">Fruits</option>
+          <option value="groceries">Groceries</option>
+        </select>
+        <button id="searchBtn" class="bg-neonGreen hover:bg-appleGreen text-white px-6 py-2 rounded">Search</button>
+      </div>
+    </section>
+    
+
+    
+
+
+    <!-- Available Materials -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow mb-8">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Available Materials</h2>
+      <div id="materialsList" class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <!-- Material cards will be dynamically inserted -->
+      </div>
+    </section>
+
+    <!-- Shopping Cart -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow mb-8">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Shopping Cart</h2>
+      <div id="cartItems" class="space-y-2 mb-4">
+        <!-- Cart items will be shown here -->
+      </div>
+      <div class="flex justify-between items-center">
+        <div id="cartTotal" class="text-lg font-semibold">Total: ₹0</div>
+        <button id="placeOrderBtn" class="bg-neonGreen hover:bg-appleGreen text-white px-6 py-2 rounded disabled:bg-gray-400" disabled>
+          Place Order
+        </button>
+      </div>
+    </section>
+    <!-- Customer Reviews -->
+<section class="bg-white bg-opacity-95 p-6 rounded shadow mt-8">
+  <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Customer Reviews</h2>
+  <div id="reviewsContainer" class="space-y-4">
+    <!-- Reviews will be injected here dynamically -->
+  </div>
+</section>
+
+
+    <!-- My Orders -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">My Orders</h2>
+      <div id="ordersList" class="space-y-4">
+        <!-- Orders will be shown here -->
+      </div>
+    </section>
+    <a href="review.html" class="bg-blue-600 text-white px-4 py-2 rounded">
+  Leave a Review
+</a>
+
+  </main>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Leave a Review | SaathiBazar</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script type="module" src="review.js" defer></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded shadow max-w-md w-full">
+    <h2 class="text-xl font-bold mb-4 text-green-700">Leave a Review</h2>
+
+    <!-- Hidden input to store vendor ID -->
+    <input type="hidden" id="vendorId" />
+
+    <div class="mb-4">
+      <label for="customerName" class="block font-medium">Your Name</label>
+      <input type="text" id="customerName" class="border p-2 w-full rounded" placeholder="Your name" />
+    </div>
+
+    <div class="mb-4">
+      <label for="rating" class="block font-medium">Rating (1–5)</label>
+      <select id="rating" class="border p-2 w-full rounded">
+        <option value="">Select rating</option>
+        <option value="5">⭐️⭐️⭐️⭐️⭐️ (5)</option>
+        <option value="4">⭐️⭐️⭐️⭐️ (4)</option>
+        <option value="3">⭐️⭐️⭐️ (3)</option>
+        <option value="2">⭐️⭐️ (2)</option>
+        <option value="1">⭐️ (1)</option>
+      </select>
+    </div>
+
+    <div class="mb-4">
+      <label for="comment" class="block font-medium">Comment</label>
+      <textarea id="comment" rows="4" class="border p-2 w-full rounded" placeholder="Your feedback..."></textarea>
+    </div>
+
+    <button id="submitReview" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full">
+      Submit Review
+    </button>
+  </div>
+</body>
+</html>

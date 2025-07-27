@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Supplier Dashboard | SaathiBazar</title>
+  <script type="module" src="supplierdashboard.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <style>
+    body {
+      background-image: url('webback.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      min-height: 100vh;
+    }
+    .bg-limeSoft { background-color: #7adf27; }
+    .bg-neonGreen { background-color: #9dd714; }
+    .bg-appleGreen { background-color: #90db0e; }
+    .fade-in-up {
+      animation: fadeInUp 1s ease-out both;
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .hover-scale {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-scale:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 bg-opacity-80 animate__animated animate__fadeIn">
+  <!-- 🔝 Navbar -->
+  <nav class="bg-limeSoft bg-opacity-60 p-4 shadow flex justify-between items-center animate__animated animate__fadeInDown">
+    <div class="flex items-center space-x-3">
+      <img src="logo.jpg" alt="Logo" class="h-10" />
+      <h1 class="text-xl font-bold text-green-800">SaathiBazar ‑ Supplier Dashboard</h1>
+    </div>
+    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-1 rounded hover-scale">Logout</button>
+  </nav>
+
+  <main class="p-6 max-w-5xl mx-auto space-y-8">
+    <!-- 📱 WhatsApp Number Save -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow fade-in-up">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Save Your WhatsApp Number</h2>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <input type="tel" id="whatsappInput" placeholder="+91xxxxxxxxxx" class="border p-2 rounded flex-1" />
+        <button id="saveWhatsappBtn" class="bg-neonGreen hover:bg-appleGreen text-white font-bold py-2 px-4 rounded hover-scale">Save WhatsApp</button>
+      </div>
+      <p id="whatsappStatus" class="text-sm text-gray-600 mt-2"></p>
+    </section>
+
+    <!-- ➕ Add Material -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow fade-in-up">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Add New Material</h2>
+      <form id="materialForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" id="materialName" placeholder="Material Name" required class="border p-2 rounded" />
+        <input type="number" id="quantity" placeholder="Quantity" required class="border p-2 rounded" />
+        <input type="text" id="unit" placeholder="Unit (e.g. kg, litres)" required class="border p-2 rounded" />
+        <input type="number" id="price" placeholder="Price per Unit" required class="border p-2 rounded" />
+        <div>
+          <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <select id="category" required class="border p-2 rounded w-full">
+            <option value="">Select Category</option>
+            <option value="vegetables">Vegetables</option>
+            <option value="fruits">Fruits</option>
+            <option value="groceries">Groceries</option>
+          </select>
+        </div>
+        <button type="submit" class="bg-neonGreen hover:bg-appleGreen text-white font-bold py-2 px-4 rounded col-span-1 md:col-span-2 hover-scale">Upload Material</button>
+      </form>
+    </section>
+
+    <!-- 📋 Uploaded Materials -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow fade-in-up">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Your Uploaded Materials</h2>
+      <div id="materialsList" class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <!-- Dynamic cards injected here -->
+      </div>
+    </section>
+
+    <!-- 📦 Orders Received -->
+    <section class="bg-white bg-opacity-95 p-6 rounded shadow fade-in-up">
+      <h2 class="text-2xl font-semibold mb-4 text-appleGreen">Orders Received</h2>
+      <div id="ordersList" class="space-y-4">
+        <!-- Orders dynamically inserted by JS -->
+      </div>
+    </section>
+  </main>
+</body>
+</html>
